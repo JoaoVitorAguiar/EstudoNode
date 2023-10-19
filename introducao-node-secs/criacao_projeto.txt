@@ -1,0 +1,7 @@
+1) npm init -y (-y "sim" em todas as perguntas)
+2) npm install express ou npm i express
+3) npm i dotenv
+4) npm i @types/express -D (-D -> desenvolvimento)
+5) npm i typeScript -D
+6) npm i @types/node -D
+7) npm i tsx
