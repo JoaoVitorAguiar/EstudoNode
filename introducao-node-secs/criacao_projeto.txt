@@ -2,6 +2,16 @@
 2) npm install express ou npm i express
 3) npm i dotenv
 4) npm i @types/express -D (-D -> desenvolvimento)
-5) npm i typeScript -D
+5) npm i typescript -D
 6) npm i @types/node -D
 7) npm i tsx
+
+Para rodar de forma proficional esta aplicação,
+    precisamos rodar o comando:
+    "npx tsx src/server.ts"
+    Porém isso não é legal, então vamos em package.json
+    e em "scripts": { }, adicionamos o seguinte:
+    "scripts": {
+    "dev": "tsx watch src/server.ts"
+    },
+    Em que "watch" significa assitir todas as mudanças do arquivo
