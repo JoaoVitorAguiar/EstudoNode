@@ -24,4 +24,16 @@ https://www.prisma.io/docs/getting-started/quickstart
     npm install prisma --save-dev
 3) Inicializar o banco de dados com Sqlite 
     npx prisma init --datasource-provider sqlite
+4) Definindo a tabela usuário
+    model User {
+    id    Int     @id @default(autoincrement())
+    email String  @unique
+    name  String?
+    @@map("users")
+    }
+5) Criando a migração
+    npx prisma migrate dev --name 
 
+6) Prisma studio 
+    npm i @prisma/client
+    npx prisma studio
