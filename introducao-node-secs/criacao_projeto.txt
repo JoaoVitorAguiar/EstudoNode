@@ -37,3 +37,11 @@ https://www.prisma.io/docs/getting-started/quickstart
 6) Prisma studio 
     npm i @prisma/client
     npx prisma studio
+
+* Tratando erros
+1) Biblioteca para caputarar os erros e mostar de forma mais amigável
+    npm i express-async-errors
+
+* Validar os dados
+1) Biblioteca para validação de dados
+    npm i zod
