@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import {prisma} from "../lib/prisma"
 import { AppError } from "../errors/AppError";
 import Zod from 'zod';
+import { Hash } from "crypto";
+import { hash } from "bcrypt";
 
 export class UsersController  {
     public async list(_request : Request, response : Response) {
@@ -25,13 +27,26 @@ export class UsersController  {
     public async create(request: Request, response: Response){
         const bodySchema = Zod.object({
             name: Zod.string().min(3),
-            email: Zod.string().email()
+            email: Zod.string().email(),
+            password: Zod.string().min(3)
         }).strict();
-        const {name, email} = bodySchema.parse(request.body);
+
+        const {name, email, password} = bodySchema.parse(request.body);
+        const { id } = request.params;
+
+        const userExists = await prisma.user.findFirst({
+            where: {email}
+        })
+
+        if(userExists) throw new AppError('User already registered', 409);  
+
+        const password_hash = await hash(password, 6);
+        
         const user = await prisma.user.create({
             data: {
                 name,
                 email,
+                password_hash
             },
         });
         return response.status(200).json(user);
