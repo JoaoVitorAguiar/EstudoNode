@@ -32,8 +32,12 @@ export class UsersController  {
         const bodySchema = Zod.object({
             name: Zod.string().min(3),
             email: Zod.string().email(),
-            password: Zod.string().min(3)
-        }).strict();
+            password: Zod.string().min(3),
+            password_confirmation: Zod.string().min(3)
+        }).strict().refine((data)=> data.password === data.password_confirmation, {
+            message: "Passwords don't match",
+            path: ['password_confirmation']
+        });
  
         const {name, email, password} = bodySchema.parse(request.body);
         const { id } = request.params;
