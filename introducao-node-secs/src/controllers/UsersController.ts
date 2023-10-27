@@ -2,14 +2,17 @@ import { Request, Response } from "express";
 import {prisma} from "../lib/prisma"
 import { AppError } from "../errors/AppError";
 import Zod from 'zod';
-import { Hash } from "crypto";
 import { hash } from "bcrypt";
+import { excludeFields } from "../utils/excludeFields";
 
 export class UsersController  {
     public async list(_request : Request, response : Response) {
         const users = await prisma.user.findMany();
 
-        return response.status(200).json(users)
+        const usesrWithoutPassword = users.map((user)=>{
+            return excludeFields(user, ['password_hash'])
+        });
+        return response.status(200).json(users);
     }
 
     public async show(request : Request, response : Response) {
@@ -19,9 +22,10 @@ export class UsersController  {
             where: {id}
         })
 
-        if(!user) throw new AppError('User not found', 404);     
-
-        return response.status(200).json(user);
+        if(!user) throw new AppError('User not found', 404);  
+        
+        const userWithoutPassword = excludeFields(user, ['password_hash']);
+        return response.status(200).json(userWithoutPassword);
     }
 
     public async create(request: Request, response: Response){
@@ -30,7 +34,7 @@ export class UsersController  {
             email: Zod.string().email(),
             password: Zod.string().min(3)
         }).strict();
-
+ 
         const {name, email, password} = bodySchema.parse(request.body);
         const { id } = request.params;
 
@@ -49,7 +53,9 @@ export class UsersController  {
                 password_hash
             },
         });
-        return response.status(200).json(user);
+
+        const userWithoutPassword = excludeFields(user, ['password_hash']);
+        return response.status(200).json(userWithoutPassword);
     }
 
     public async update(request: Request, response: Response){
@@ -73,7 +79,9 @@ export class UsersController  {
             where: {id},
             data
         });
-        return response.status(200).json(user);
+
+        const userWithoutPassword = excludeFields(user, ['password_hash']);
+        return response.status(200).json(userWithoutPassword);
     }
 
     public async delete(request : Request, response : Response) {
@@ -89,6 +97,7 @@ export class UsersController  {
             where: {id}
         })
 
-        return response.status(200).json(user);
+        const userWithoutPassword = excludeFields(user, ['password_hash']);
+        return response.status(200).json(userWithoutPassword);
     }
 }
