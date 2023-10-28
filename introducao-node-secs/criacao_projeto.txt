@@ -45,5 +45,11 @@ https://www.prisma.io/docs/getting-started/quickstart
 * Validar os dados
 1) Biblioteca para validação de dados
     npm i zod
+
 * Adicionado senha ao usuário:
-    criando os campos "password_hash", "created_at" e "updated_at" no prisma
+1) Criando os campos "password_hash", "created_at" e "updated_at" no prisma
+2) Instalando o pacote para encriptar senhas
+    npm i bcrypt @types/bcrypt
+
+* Autenticação e Autorização
+
