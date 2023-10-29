@@ -57,3 +57,9 @@ https://www.prisma.io/docs/getting-started/quickstart
 
 * Tornado as rotas privadas - MIDDLEWARES
     podemos ter quantos middlewares entre a requisição e o controlador
+
+* Adicionando a entidade tasks:
+1) resetando o banco para não da conflitos
+    npx prisma migrate reset --force
+2) depois de criado o schema do banco, fazemos o migrate
+    npx prisma migrate dev
