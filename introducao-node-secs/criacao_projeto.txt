@@ -52,4 +52,8 @@ https://www.prisma.io/docs/getting-started/quickstart
     npm i bcrypt @types/bcrypt
 
 * Autenticação e Autorização
+1) npm i jsonwebtoken
+2) npm i -D @types/jsonwebtoken
 
+* Tornado as rotas privadas - MIDDLEWARES
+    podemos ter quantos middlewares entre a requisição e o controlador
