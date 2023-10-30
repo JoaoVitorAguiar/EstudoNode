@@ -7,101 +7,85 @@ import { excludeFields } from "../utils/excludeFields";
 
 export class TasksController  {
     public async list(_request : Request, response : Response) {
-        const users = await prisma.user.findMany();
+        const tasks = await prisma.task.findMany();
 
-        const usesrWithoutPassword = users.map((user)=>{
-            return excludeFields(user, ['password_hash'])
-        });
-        return response.status(200).json(users);
+        return response.status(200).json(tasks);
     }
 
     public async show(request : Request, response : Response) {
         const { id } = request.params;
 
-        const user = await prisma.user.findUnique({
+        const task = await prisma.task.findUnique({
             where: {id}
         })
 
-        if(!user) throw new AppError('User not found', 404);  
+        if(!task) throw new AppError('Task not found', 404);  
         
-        const userWithoutPassword = excludeFields(user, ['password_hash']);
-        return response.status(200).json(userWithoutPassword);
+        return response.status(200).json(task);
     }
 
     public async create(request: Request, response: Response){
         const bodySchema = Zod.object({
             name: Zod.string().min(3),
-            email: Zod.string().email(),
-            password: Zod.string().min(3),
-            password_confirmation: Zod.string().min(3)
-        }).strict().refine((data)=> data.password === data.password_confirmation, {
-            message: "Passwords don't match",
-            path: ['password_confirmation']
-        });
+            time: Zod.string().min(3),
+            user_id: Zod.string().uuid()
+        }).strict();
  
-        const {name, email, password} = bodySchema.parse(request.body);
-        const { id } = request.params;
-
+        const {name, time, user_id} = bodySchema.parse(request.body);
         const userExists = await prisma.user.findFirst({
-            where: {email}
+            where: {id: user_id}
         })
 
-        if(userExists) throw new AppError('User already registered', 409);  
-
-        const password_hash = await hash(password, 6);
-        
-        const user = await prisma.user.create({
+        if(!userExists) throw new AppError('User not found', 404);  
+        const task = await prisma.task.create({
             data: {
                 name,
-                email,
-                password_hash
+                time,
+                user_id
             },
         });
 
-        const userWithoutPassword = excludeFields(user, ['password_hash']);
-        return response.status(200).json(userWithoutPassword);
+        return response.status(200).json(task);
     }
 
     public async update(request: Request, response: Response){
         const {id} =  request.params;
         const bodySchema = Zod.object({
             name: Zod.string().min(3).nullish(),
-            email: Zod.string().email().nullish()
+            time: Zod.string().min(3).nullish(),
         }).strict();
-        const {name, email} = bodySchema.parse(request.body);
-        const userExists = await prisma.user.findUnique({
+
+        const {name, time } = bodySchema.parse(request.body);
+        const taskExists = await prisma.task.findUnique({
             where: {id}
         })
 
-        if(!userExists) throw new AppError('User not found', 404); 
+        if(!taskExists) throw new AppError('Task not found', 404); 
 
         let data = {}
         if (name) data = {name};
-        if(email) data = {...data, email}; 
+        if(time) data = {...data, time}; 
 
-        const user = await prisma.user.update({
+        const task = await prisma.task.update({
             where: {id},
             data
         });
 
-        const userWithoutPassword = excludeFields(user, ['password_hash']);
-        return response.status(200).json(userWithoutPassword);
+        return response.status(200).json(task);
     }
 
     public async delete(request : Request, response : Response) {
         const { id } = request.params;
 
-        const user = await prisma.user.findUnique({
+        const task = await prisma.task.findUnique({
             where: {id}
         })
 
-        if(!user) throw new AppError('User not found', 404); 
+        if(!task) throw new AppError('Task not found', 404); 
 
-        await prisma.user.delete({
+        await prisma.task.delete({
             where: {id}
         })
-
-        const userWithoutPassword = excludeFields(user, ['password_hash']);
-        return response.status(200).json(userWithoutPassword);
+        return response.status(200).json(task);
     }
 }
