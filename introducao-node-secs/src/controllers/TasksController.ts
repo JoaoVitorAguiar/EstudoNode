@@ -6,17 +6,21 @@ import { hash } from "bcrypt";
 import { excludeFields } from "../utils/excludeFields";
 
 export class TasksController  {
-    public async list(_request : Request, response : Response) {
-        const tasks = await prisma.task.findMany();
+    public async list(request : Request, response : Response) {
+        const user_id = request.userId;
+        const tasks = await prisma.task.findMany({
+            where: {user_id}
+        });
 
         return response.status(200).json(tasks);
     }
 
     public async show(request : Request, response : Response) {
         const { id } = request.params;
+        const user_id = request.userId;
 
-        const task = await prisma.task.findUnique({
-            where: {id}
+        const task = await prisma.task.findFirst({
+            where: {id, user_id}
         })
 
         if(!task) throw new AppError('Task not found', 404);  
@@ -28,10 +32,10 @@ export class TasksController  {
         const bodySchema = Zod.object({
             name: Zod.string().min(3),
             time: Zod.string().min(3),
-            user_id: Zod.string().uuid()
         }).strict();
  
-        const {name, time, user_id} = bodySchema.parse(request.body);
+        const {name, time} = bodySchema.parse(request.body);
+        const user_id = request.userId;
         const userExists = await prisma.user.findFirst({
             where: {id: user_id}
         })
@@ -56,8 +60,9 @@ export class TasksController  {
         }).strict();
 
         const {name, time } = bodySchema.parse(request.body);
-        const taskExists = await prisma.task.findUnique({
-            where: {id}
+        const user_id = request.userId;
+        const taskExists = await prisma.task.findFirst({
+            where: {id, user_id}
         })
 
         if(!taskExists) throw new AppError('Task not found', 404); 
@@ -76,9 +81,9 @@ export class TasksController  {
 
     public async delete(request : Request, response : Response) {
         const { id } = request.params;
-
+        const user_id = request.userId;
         const task = await prisma.task.findUnique({
-            where: {id}
+            where: {id, user_id}
         })
 
         if(!task) throw new AppError('Task not found', 404); 
