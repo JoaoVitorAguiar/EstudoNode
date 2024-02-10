@@ -1,5 +1,4 @@
-import { prisma } from "@/lib/prisma"
-import { hash } from "bcryptjs"
+import { registerUseCase } from "@/use-cases/register"
 import { FastifyRequest, FastifyReply } from "fastify"
 import { z } from "zod"
 
@@ -12,22 +11,11 @@ export async function register(request: FastifyRequest, replay: FastifyReply) {
     })
     const { name, email, password } = registerBodySchema.parse(request.body) // "Parse()" lança um erro, ja o parseSafe() não
 
-    const password_hash = await hash(password, 6)
-
-    const userWithSameEmail = await prisma.user.findUnique({
-        where: {
-            email
-        }
-    })
-    if (userWithSameEmail) return replay.status(409).send() // 409 => conflito / dados duplicados
-
-    await prisma.user.create({
-        data: {
-            name,
-            email,
-            password_hash
-        }
-    })
+    try {
+        await registerUseCase({ name, email, password })
+    } catch (error) {
+        return replay.status(409).send()
+    }
 
     return replay.status(201).send()
 }
