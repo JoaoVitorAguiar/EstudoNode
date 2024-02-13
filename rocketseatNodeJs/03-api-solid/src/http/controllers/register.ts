@@ -1,4 +1,5 @@
-import { registerUseCase } from "@/use-cases/register"
+import { PrismaUserRepository } from "@/repositories/prisma-users-repository"
+import { RegisterUseCase } from "@/use-cases/register"
 import { FastifyRequest, FastifyReply } from "fastify"
 import { z } from "zod"
 
@@ -12,7 +13,9 @@ export async function register(request: FastifyRequest, replay: FastifyReply) {
     const { name, email, password } = registerBodySchema.parse(request.body) // "Parse()" lança um erro, ja o parseSafe() não
 
     try {
-        await registerUseCase({ name, email, password })
+        const prismaUserRepository = new PrismaUserRepository()
+        const registerUseCase = new RegisterUseCase(prismaUserRepository);
+        await registerUseCase.execute({ name, email, password })
     } catch (error) {
         return replay.status(409).send()
     }
