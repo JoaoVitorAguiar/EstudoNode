@@ -56,7 +56,7 @@ describe('Register Use Case', () => { // os testes dentro do describe são agrup
         })
 
 
-        expect(
+        await expect(
             // Espero que quando essa promise acabar ela rejeite e o resultado dela seja uma onstância da classe UserAlreadyExistsError
             registerUseCase.execute({
                 name: 'Vitor',
