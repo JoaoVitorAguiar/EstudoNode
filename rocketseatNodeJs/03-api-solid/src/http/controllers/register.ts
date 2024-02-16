@@ -1,8 +1,7 @@
 import { UserAlreadyExistsError } from "@/use-cases/erros/user-already-exists-error"
-import { PrismaUserRepository } from "@/repositories/prisma/prisma-users-repository"
-import { RegisterUseCase } from "@/use-cases/register"
 import { FastifyRequest, FastifyReply } from "fastify"
 import { z } from "zod"
+import { makeRegisterUseCase } from "@/use-cases/factories/make-register-use-case"
 
 export async function register(request: FastifyRequest, replay: FastifyReply) {
     const registerBodySchema = z.object({
@@ -14,8 +13,7 @@ export async function register(request: FastifyRequest, replay: FastifyReply) {
     const { name, email, password } = registerBodySchema.parse(request.body) // "Parse()" lança um erro, ja o parseSafe() não
 
     try {
-        const prismaUserRepository = new PrismaUserRepository()
-        const registerUseCase = new RegisterUseCase(prismaUserRepository);
+        const registerUseCase = makeRegisterUseCase()
         await registerUseCase.execute({ name, email, password })
     } catch (error) {
         if (error instanceof UserAlreadyExistsError) return replay.status(409).send({
