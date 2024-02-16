@@ -3,13 +3,19 @@ import { RegisterUseCase } from './register'
 import { compare } from 'bcryptjs'
 import { InMemomyUserRepository } from '@/repositories/in-memory/in-memory-user-repository'
 import { UserAlreadyExistsError } from './erros/user-already-exists-error'
+import { beforeEach } from 'vitest'
+
+let userRepository: InMemomyUserRepository
+let sut: RegisterUseCase
 
 describe('Register Use Case', () => { // os testes dentro do describe são agrupados
-    it('Should be able to register', async () => {
-        const userRepository = new InMemomyUserRepository()
-        const registerUseCase = new RegisterUseCase(userRepository)
+    beforeEach(() => {
+        userRepository = new InMemomyUserRepository()
+        sut = new RegisterUseCase(userRepository)
+    })
 
-        const { user } = await registerUseCase.execute({
+    it('Should be able to register', async () => {
+        const { user } = await sut.execute({
             name: 'João',
             email: 'joao@test.com',
             password: '123456'
@@ -25,10 +31,7 @@ describe('Register Use Case', () => { // os testes dentro do describe são agrup
 
 
     it('Should hash user password upon registration', async () => {
-        const userRepository = new InMemomyUserRepository()
-        const registerUseCase = new RegisterUseCase(userRepository)
-
-        const { user } = await registerUseCase.execute({
+        const { user } = await sut.execute({
             name: 'João',
             email: 'joao@test.com',
             password: '123456'
@@ -44,21 +47,17 @@ describe('Register Use Case', () => { // os testes dentro do describe são agrup
 
 
     it('Should be not be able to register with same email twice', async () => {
-        const userRepository = new InMemomyUserRepository()
-        const registerUseCase = new RegisterUseCase(userRepository)
-
         const email = 'joao@test.com'
 
-        await registerUseCase.execute({
+        await sut.execute({
             name: 'João Vitor',
             email: email,
             password: '123456'
         })
 
-
         await expect(
             // Espero que quando essa promise acabar ela rejeite e o resultado dela seja uma onstância da classe UserAlreadyExistsError
-            registerUseCase.execute({
+            sut.execute({
                 name: 'Vitor',
                 email: email,
                 password: '896543'

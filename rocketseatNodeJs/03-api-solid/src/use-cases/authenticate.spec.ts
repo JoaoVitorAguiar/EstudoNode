@@ -3,12 +3,18 @@ import { compare, hash } from 'bcryptjs'
 import { InMemomyUserRepository } from '@/repositories/in-memory/in-memory-user-repository'
 import { AuthenticateUseCase } from './authenticate'
 import { InvalidCredentialsError } from './erros/invalid-credentials-error'
+import { beforeEach } from 'vitest'
+
+let userRepository: InMemomyUserRepository
+let sut: AuthenticateUseCase
 
 describe('Authenticate Use Case', () => { // os testes dentro do describe são agrupados
-    it('Should be able to authenticate', async () => {
-        const userRepository = new InMemomyUserRepository()
-        const sut = new AuthenticateUseCase(userRepository)
+    beforeEach(() => {
+        userRepository = new InMemomyUserRepository()
+        sut = new AuthenticateUseCase(userRepository)
+    })
 
+    it('Should be able to authenticate', async () => {
         const name = 'João Authenticate teste'
         const email = 'authenticate@test.com'
         const password = '123456'
@@ -31,9 +37,6 @@ describe('Authenticate Use Case', () => { // os testes dentro do describe são a
     })
 
     it('Should be not be able to authenticate with wrong email', async () => {
-        const userRepository = new InMemomyUserRepository()
-        const sut = new AuthenticateUseCase(userRepository)
-
         const name = 'João Authenticate teste'
         const email = 'authenticate@test.com'
         const password = '123456'
@@ -48,9 +51,6 @@ describe('Authenticate Use Case', () => { // os testes dentro do describe são a
     })
 
     it('Should be not be able to authenticate with wrong password', async () => {
-        const userRepository = new InMemomyUserRepository()
-        const sut = new AuthenticateUseCase(userRepository)
-
         const name = 'João Authenticate teste'
         const email = 'authenticate@test.com'
         const password = '123456'
