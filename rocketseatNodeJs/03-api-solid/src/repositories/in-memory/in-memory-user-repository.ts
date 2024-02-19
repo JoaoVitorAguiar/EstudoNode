@@ -4,6 +4,12 @@ import { UserRepository } from "../user-repository";
 export class InMemomyUserRepository implements UserRepository {
     public users: User[] = []
 
+    async findById(userId: string) {
+        const user = this.users.find(u => u.id == userId) // find no array retorna undenfined caso não encontre
+        if (!user) return null
+        return user
+    }
+
     async create(data: Prisma.UserCreateInput) {
         const user = {
             id: 'user-1',
