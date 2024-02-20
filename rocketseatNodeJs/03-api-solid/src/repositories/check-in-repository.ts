@@ -6,5 +6,7 @@ export interface CheckInsRepository {
     findManyByUserId(userId: string, page: number): Promise<CheckIn[]>
     findByUserIdOnDate(userId: string, date: Date): Promise<CheckIn | null>
     countByUserId(userId: string): Promise<number>
+    save(checkIn: CheckIn): Promise<CheckIn>
+    findById(id: string): Promise<CheckIn | null>
 }
 // CheckInUncheckedCreateInput tem campos que permite a criação de checkin com o usuário e gym já criados
