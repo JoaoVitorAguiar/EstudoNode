@@ -1,11 +1,10 @@
-import { UserRepository } from "@/repositories/user-repository";
-import { InvalidCredentialsError } from "./erros/invalid-credentials-error";
-import { compare } from "bcryptjs";
 import { CheckIn } from "@prisma/client";
 import { CheckInsRepository } from "@/repositories/check-in-repository";
 import { GymsRepository } from "@/repositories/gyms-repository";
 import { ResourceNotFoundError } from "./erros/resource-not-found-error";
 import { getDistanceBetweenCoordinates } from "@/utils/get-distance-between-coordinates";
+import { MaxNumberOfCheckInsError } from "./erros/max-number-of-check-ins-error";
+import { MaxDistanceError } from "./erros/max-distance-error";
 
 // DTOs
 interface CheckInUseCaseRequest {
@@ -39,14 +38,14 @@ export class CheckInUseCase {
         const MAX_DISTANCE_IN_KM = 0.1
 
         if (distance > MAX_DISTANCE_IN_KM) {
-            throw Error()
+            throw new MaxDistanceError()
         }
         const checkInOnSameDay = await this.checkInsRepository.findByUserIdOnDate(
             userId,
             new Date(),
         )
         if (checkInOnSameDay) {
-            throw new Error()
+            throw new MaxNumberOfCheckInsError()
         }
 
         // Calcular distancia e verificar se for menor que 100m
