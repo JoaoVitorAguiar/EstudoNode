@@ -1,4 +1,3 @@
-// index.js
 const { add, divide, logarithm, multiply, power, sine, squareRoot, subtract } = require('./calculator');
 
 const num1 = process.argv[2];
